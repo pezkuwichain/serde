@@ -109,6 +109,11 @@
 
 use crate::lib::*;
 
+// Explicit prelude import for wasm32v1-none target compatibility
+#[allow(unused_imports)]
+#[cfg(not(feature = "std"))]
+use ::core::prelude::rust_2021::*;
+
 mod fmt;
 mod impls;
 mod impossible;

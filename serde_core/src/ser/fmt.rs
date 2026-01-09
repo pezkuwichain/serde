@@ -1,4 +1,10 @@
 use crate::lib::*;
+
+// Explicit prelude import for wasm32v1-none target compatibility
+#[allow(unused_imports)]
+#[cfg(not(feature = "std"))]
+use ::core::prelude::rust_2021::*;
+
 use crate::ser::{Error, Impossible, Serialize, Serializer};
 
 impl Error for fmt::Error {

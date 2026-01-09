@@ -1,5 +1,11 @@
 use crate::lib::*;
 
+// Explicit prelude import for wasm32v1-none target compatibility
+// These may appear unused but are required for ?Sized bounds on wasm32v1-none
+#[allow(unused_imports)]
+#[cfg(not(feature = "std"))]
+use ::core::prelude::rust_2021::*;
+
 use crate::de::{
     Deserialize, Deserializer, EnumAccess, Error, MapAccess, SeqAccess, Unexpected, VariantAccess,
     Visitor,
