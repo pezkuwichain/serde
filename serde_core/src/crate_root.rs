@@ -6,10 +6,26 @@ macro_rules! crate_root {
         mod lib {
             mod core {
                 #[cfg(not(feature = "std"))]
-                pub use core::*;
+                pub use ::core::*;
                 #[cfg(feature = "std")]
-                pub use std::*;
+                pub use ::std::*;
             }
+
+            // Re-export the full prelude for wasm32v1-none and other targets
+            #[cfg(not(feature = "std"))]
+            pub use ::core::prelude::rust_2021::*;
+            #[cfg(feature = "std")]
+            pub use ::std::prelude::rust_2021::*;
+
+            // Prelude items that may not be re-exported by glob import
+            #[cfg(not(feature = "std"))]
+            pub use ::core::option::Option::{self, None, Some};
+            #[cfg(not(feature = "std"))]
+            pub use ::core::result::Result::{self, Err, Ok};
+            #[cfg(feature = "std")]
+            pub use ::std::option::Option::{self, None, Some};
+            #[cfg(feature = "std")]
+            pub use ::std::result::Result::{self, Err, Ok};
 
             pub use self::core::{f32, f64};
             pub use self::core::{iter, num, str};
@@ -20,7 +36,16 @@ macro_rules! crate_root {
             pub use self::core::cell::{Cell, RefCell};
             pub use self::core::cmp::Reverse;
             pub use self::core::fmt::{self, Debug, Display, Write as FmtWrite};
-            pub use self::core::marker::PhantomData;
+            pub use self::core::marker::{PhantomData, Sized};
+            pub use self::core::clone::Clone;
+            pub use self::core::marker::{Copy, Send, Sync, Unpin};
+            pub use self::core::default::Default;
+            pub use self::core::cmp::{Eq, Ord, PartialEq, PartialOrd};
+            pub use self::core::convert::{AsMut, AsRef, From, Into};
+            pub use self::core::iter::{
+                DoubleEndedIterator, ExactSizeIterator, Extend, IntoIterator, Iterator,
+            };
+            pub use self::core::ops::{Drop, Fn, FnMut, FnOnce};
             pub use self::core::num::Wrapping;
             pub use self::core::ops::{Bound, Range, RangeFrom, RangeInclusive, RangeTo};
             pub use self::core::result;

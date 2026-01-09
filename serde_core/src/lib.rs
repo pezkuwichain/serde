@@ -103,6 +103,10 @@
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+// Explicitly import core crate for no_std targets (especially wasm32v1-none)
+#[cfg(not(feature = "std"))]
+extern crate core;
+
 #[macro_use]
 mod crate_root;
 #[macro_use]
