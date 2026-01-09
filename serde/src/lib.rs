@@ -190,13 +190,33 @@ macro_rules! crate_root {
         /// A facade around all the types we need from the `std`, `core`, and `alloc`
         /// crates. This avoids elaborate import wrangling having to happen in every
         /// module.
+        ///
+        /// NOTE: On targets where std is not available (target_os = "none", e.g. wasm32v1-none),
+        /// we always use core/alloc even if the "std" feature is enabled due to Cargo feature
+        /// unification.
         mod lib {
             mod core {
-                #[cfg(not(feature = "std"))]
-                pub use core::*;
-                #[cfg(feature = "std")]
-                pub use std::*;
+                #[cfg(any(not(feature = "std"), target_os = "none"))]
+                pub use ::core::*;
+                #[cfg(all(feature = "std", not(target_os = "none")))]
+                pub use ::std::*;
             }
+
+            // Re-export the full prelude for wasm32v1-none and other no_std targets
+            #[cfg(any(not(feature = "std"), target_os = "none"))]
+            pub use ::core::prelude::rust_2021::*;
+            #[cfg(all(feature = "std", not(target_os = "none")))]
+            pub use ::std::prelude::rust_2021::*;
+
+            // Prelude items that may not be re-exported by glob import
+            #[cfg(any(not(feature = "std"), target_os = "none"))]
+            pub use ::core::option::Option::{self, None, Some};
+            #[cfg(any(not(feature = "std"), target_os = "none"))]
+            pub use ::core::result::Result::{self, Err, Ok};
+            #[cfg(all(feature = "std", not(target_os = "none")))]
+            pub use ::std::option::Option::{self, None, Some};
+            #[cfg(all(feature = "std", not(target_os = "none")))]
+            pub use ::std::result::Result::{self, Err, Ok};
 
             pub use self::core::{f32, f64};
             pub use self::core::{ptr, str};
@@ -212,24 +232,24 @@ macro_rules! crate_root {
             pub use self::core::option;
             pub use self::core::result;
 
-            #[cfg(all(feature = "alloc", not(feature = "std")))]
+            #[cfg(all(feature = "alloc", any(not(feature = "std"), target_os = "none")))]
             pub use alloc::borrow::{Cow, ToOwned};
-            #[cfg(feature = "std")]
+            #[cfg(all(feature = "std", not(target_os = "none")))]
             pub use std::borrow::{Cow, ToOwned};
 
-            #[cfg(all(feature = "alloc", not(feature = "std")))]
+            #[cfg(all(feature = "alloc", any(not(feature = "std"), target_os = "none")))]
             pub use alloc::string::{String, ToString};
-            #[cfg(feature = "std")]
+            #[cfg(all(feature = "std", not(target_os = "none")))]
             pub use std::string::{String, ToString};
 
-            #[cfg(all(feature = "alloc", not(feature = "std")))]
+            #[cfg(all(feature = "alloc", any(not(feature = "std"), target_os = "none")))]
             pub use alloc::vec::Vec;
-            #[cfg(feature = "std")]
+            #[cfg(all(feature = "std", not(target_os = "none")))]
             pub use std::vec::Vec;
 
-            #[cfg(all(feature = "alloc", not(feature = "std")))]
+            #[cfg(all(feature = "alloc", any(not(feature = "std"), target_os = "none")))]
             pub use alloc::boxed::Box;
-            #[cfg(feature = "std")]
+            #[cfg(all(feature = "std", not(target_os = "none")))]
             pub use std::boxed::Box;
         }
 
