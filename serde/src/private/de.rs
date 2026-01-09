@@ -1,5 +1,9 @@
 use crate::lib::*;
 
+// Explicit prelude import for wasm32v1-none and other no_std targets
+#[allow(unused_imports)]
+use ::core::prelude::rust_2021::*;
+
 use crate::de::value::{BorrowedBytesDeserializer, BytesDeserializer};
 use crate::de::{
     Deserialize, DeserializeSeed, Deserializer, EnumAccess, Error, IntoDeserializer, VariantAccess,
