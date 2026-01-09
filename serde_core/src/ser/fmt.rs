@@ -1,8 +1,7 @@
 use crate::lib::*;
 
-// Explicit prelude import for wasm32v1-none target compatibility
+// Explicit prelude import for wasm32v1-none and other no_std targets
 #[allow(unused_imports)]
-#[cfg(not(feature = "std"))]
 use ::core::prelude::rust_2021::*;
 
 use crate::ser::{Error, Impossible, Serialize, Serializer};

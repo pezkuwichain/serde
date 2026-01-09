@@ -1,9 +1,9 @@
 use crate::lib::*;
 
-// Explicit prelude import for wasm32v1-none target compatibility
-// These may appear unused but are required for ?Sized bounds on wasm32v1-none
+// Explicit prelude import for wasm32v1-none and other no_std targets
+// Even when "std" feature is enabled (due to Cargo feature unification),
+// the prelude may not be injected on wasm32v1-none target
 #[allow(unused_imports)]
-#[cfg(not(feature = "std"))]
 use ::core::prelude::rust_2021::*;
 
 use crate::de::{
@@ -237,7 +237,7 @@ macro_rules! num_as_copysign_self {
                 Ok(v as Self::Value)
             }
 
-            #[cfg(feature = "std")]
+            #[cfg(all(feature = "std", not(target_os = "none")))]
             {
                 // Preserve sign of NaN. The `as` produces a nondeterministic sign.
                 let sign = if v.is_sign_positive() { 1.0 } else { -1.0 };
@@ -1113,7 +1113,7 @@ seq_impl!(
 );
 
 seq_impl!(
-    #[cfg(feature = "std")]
+    #[cfg(all(feature = "std", not(target_os = "none")))]
     #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     HashSet<T: Eq + Hash, S: BuildHasher + Default>,
     seq,
@@ -1569,7 +1569,7 @@ map_impl! {
 }
 
 map_impl! {
-    #[cfg(feature = "std")]
+    #[cfg(all(feature = "std", not(target_os = "none")))]
     #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     HashMap<K: Eq + Hash, V, S: BuildHasher + Default>,
     map,
@@ -1787,10 +1787,10 @@ parse_socket_impl! {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 struct PathVisitor;
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 impl<'a> Visitor<'a> for PathVisitor {
     type Value = &'a Path;
 
@@ -1815,7 +1815,7 @@ impl<'a> Visitor<'a> for PathVisitor {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<'de: 'a, 'a> Deserialize<'de> for &'a Path {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -1826,10 +1826,10 @@ impl<'de: 'a, 'a> Deserialize<'de> for &'a Path {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 struct PathBufVisitor;
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 impl<'de> Visitor<'de> for PathBufVisitor {
     type Value = PathBuf;
 
@@ -1870,7 +1870,7 @@ impl<'de> Visitor<'de> for PathBufVisitor {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<'de> Deserialize<'de> for PathBuf {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -1882,7 +1882,7 @@ impl<'de> Deserialize<'de> for PathBuf {
 }
 
 forwarded_impl! {
-    #[cfg(feature = "std")]
+    #[cfg(all(feature = "std", not(target_os = "none")))]
     #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     (), Box<Path>, PathBuf::into_boxed_path
 }
@@ -1893,17 +1893,17 @@ forwarded_impl! {
 //
 //    #[derive(Deserialize)]
 //    #[serde(variant_identifier)]
-#[cfg(all(feature = "std", any(unix, windows)))]
+#[cfg(all(feature = "std", not(target_os = "none"), any(unix, windows)))]
 variant_identifier! {
     OsStringKind (Unix; b"Unix"; 0, Windows; b"Windows"; 1)
     "`Unix` or `Windows`",
     OSSTR_VARIANTS
 }
 
-#[cfg(all(feature = "std", any(unix, windows)))]
+#[cfg(all(feature = "std", not(target_os = "none"), any(unix, windows)))]
 struct OsStringVisitor;
 
-#[cfg(all(feature = "std", any(unix, windows)))]
+#[cfg(all(feature = "std", not(target_os = "none"), any(unix, windows)))]
 impl<'de> Visitor<'de> for OsStringVisitor {
     type Value = OsString;
 
@@ -1944,7 +1944,7 @@ impl<'de> Visitor<'de> for OsStringVisitor {
     }
 }
 
-#[cfg(all(feature = "std", any(unix, windows)))]
+#[cfg(all(feature = "std", not(target_os = "none"), any(unix, windows)))]
 #[cfg_attr(docsrs, doc(cfg(all(feature = "std", any(unix, windows)))))]
 impl<'de> Deserialize<'de> for OsString {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -1976,7 +1976,7 @@ forwarded_impl! {
 }
 
 forwarded_impl! {
-    #[cfg(all(feature = "std", any(unix, windows)))]
+    #[cfg(all(feature = "std", not(target_os = "none"), any(unix, windows)))]
     #[cfg_attr(docsrs, doc(cfg(all(feature = "std", any(unix, windows)))))]
     (), Box<OsStr>, OsString::into_boxed_os_str
 }
@@ -2111,13 +2111,13 @@ forwarded_impl! {
 }
 
 forwarded_impl! {
-    #[cfg(feature = "std")]
+    #[cfg(all(feature = "std", not(target_os = "none")))]
     #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     (T), Mutex<T>, Mutex::new
 }
 
 forwarded_impl! {
-    #[cfg(feature = "std")]
+    #[cfg(all(feature = "std", not(target_os = "none")))]
     #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     (T), RwLock<T>, RwLock::new
 }
@@ -2272,7 +2272,7 @@ impl<'de> Deserialize<'de> for Duration {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<'de> Deserialize<'de> for SystemTime {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -3105,7 +3105,7 @@ where
     }
 }
 
-#[cfg(all(feature = "std", not(no_std_atomic)))]
+#[cfg(all(feature = "std", not(target_os = "none"), not(no_std_atomic)))]
 macro_rules! atomic_impl {
     ($($ty:ident $size:expr)*) => {
         $(
@@ -3123,7 +3123,7 @@ macro_rules! atomic_impl {
     };
 }
 
-#[cfg(all(feature = "std", not(no_std_atomic)))]
+#[cfg(all(feature = "std", not(target_os = "none"), not(no_std_atomic)))]
 atomic_impl! {
     AtomicBool "8"
     AtomicI8 "8"
@@ -3136,7 +3136,7 @@ atomic_impl! {
     AtomicUsize "ptr"
 }
 
-#[cfg(all(feature = "std", not(no_std_atomic64)))]
+#[cfg(all(feature = "std", not(target_os = "none"), not(no_std_atomic64)))]
 atomic_impl! {
     AtomicI64 "64"
     AtomicU64 "64"

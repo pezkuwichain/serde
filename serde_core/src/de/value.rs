@@ -112,7 +112,7 @@ impl Debug for Error {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl error::Error for Error {
     fn description(&self) -> &str {
@@ -1160,7 +1160,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<'de, T, S, E> IntoDeserializer<'de, E> for HashSet<T, S>
 where
@@ -1588,7 +1588,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<'de, K, V, S, E> IntoDeserializer<'de, E> for HashMap<K, V, S>
 where

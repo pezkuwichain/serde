@@ -2,9 +2,8 @@
 
 use crate::lib::*;
 
-// Explicit prelude import for wasm32v1-none target compatibility
+// Explicit prelude import for wasm32v1-none and other no_std targets
 #[allow(unused_imports)]
-#[cfg(not(feature = "std"))]
 use ::core::prelude::rust_2021::*;
 
 use crate::ser;
@@ -23,7 +22,7 @@ impl ser::Error for Error {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(not(no_diagnostic_namespace), diagnostic::do_not_recommend)]
 impl error::Error for Error {
     fn description(&self) -> &str {

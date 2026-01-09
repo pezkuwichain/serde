@@ -114,9 +114,8 @@
 
 use crate::lib::*;
 
-// Explicit prelude import for wasm32v1-none target compatibility
+// Explicit prelude import for wasm32v1-none and other no_std targets
 #[allow(unused_imports)]
-#[cfg(not(feature = "std"))]
 use ::core::prelude::rust_2021::*;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,13 +126,13 @@ mod ignored_any;
 mod impls;
 
 pub use self::ignored_any::IgnoredAny;
-#[cfg(all(not(feature = "std"), no_core_error))]
+#[cfg(all(any(not(feature = "std"), target_os = "none"), no_core_error))]
 #[doc(no_inline)]
 pub use crate::std_error::Error as StdError;
-#[cfg(not(any(feature = "std", no_core_error)))]
+#[cfg(all(any(not(feature = "std"), target_os = "none"), not(no_core_error)))]
 #[doc(no_inline)]
 pub use core::error::Error as StdError;
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[doc(no_inline)]
 pub use std::error::Error as StdError;
 
@@ -305,10 +304,10 @@ macro_rules! declare_error_trait {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 declare_error_trait!(Error: Sized + StdError);
 
-#[cfg(not(feature = "std"))]
+#[cfg(any(not(feature = "std"), target_os = "none"))]
 declare_error_trait!(Error: Sized + Debug + Display);
 
 /// `Unexpected` represents an unexpected invocation of any one of the `Visitor`

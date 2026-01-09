@@ -1,9 +1,9 @@
 use crate::lib::*;
 
-// Explicit prelude import for wasm32v1-none target compatibility
-// These may appear unused but are required for ?Sized bounds on wasm32v1-none
+// Explicit prelude import for wasm32v1-none and other no_std targets
+// Even when "std" feature is enabled (due to Cargo feature unification),
+// the prelude may not be injected on wasm32v1-none target
 #[allow(unused_imports)]
-#[cfg(not(feature = "std"))]
 use ::core::prelude::rust_2021::*;
 
 use crate::ser::{Error, Serialize, SerializeTuple, Serializer};
@@ -225,7 +225,7 @@ seq_impl! {
 }
 
 seq_impl! {
-    #[cfg(feature = "std")]
+    #[cfg(all(feature = "std", not(target_os = "none")))]
     #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     HashSet<T, H: BuildHasher>
 }
@@ -456,7 +456,7 @@ map_impl! {
 }
 
 map_impl! {
-    #[cfg(feature = "std")]
+    #[cfg(all(feature = "std", not(target_os = "none")))]
     #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     HashMap<K: Eq + Hash, V, H: BuildHasher>
 }
@@ -630,7 +630,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<T> Serialize for Mutex<T>
 where
@@ -647,7 +647,7 @@ where
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<T> Serialize for RwLock<T>
 where
@@ -703,7 +703,7 @@ impl Serialize for Duration {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl Serialize for SystemTime {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -909,7 +909,7 @@ impl Serialize for net::SocketAddrV6 {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl Serialize for Path {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -923,7 +923,7 @@ impl Serialize for Path {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(target_os = "none")))]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl Serialize for PathBuf {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -934,7 +934,7 @@ impl Serialize for PathBuf {
     }
 }
 
-#[cfg(all(feature = "std", any(unix, windows)))]
+#[cfg(all(feature = "std", not(target_os = "none"), any(unix, windows)))]
 #[cfg_attr(docsrs, doc(cfg(all(feature = "std", any(unix, windows)))))]
 impl Serialize for OsStr {
     #[cfg(unix)]
@@ -957,7 +957,7 @@ impl Serialize for OsStr {
     }
 }
 
-#[cfg(all(feature = "std", any(unix, windows)))]
+#[cfg(all(feature = "std", not(target_os = "none"), any(unix, windows)))]
 #[cfg_attr(docsrs, doc(cfg(all(feature = "std", any(unix, windows)))))]
 impl Serialize for OsString {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -1012,7 +1012,7 @@ where
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(all(feature = "std", not(no_std_atomic)))]
+#[cfg(all(feature = "std", not(target_os = "none"), not(no_std_atomic)))]
 macro_rules! atomic_impl {
     ($($ty:ident $size:expr)*) => {
         $(
@@ -1031,7 +1031,7 @@ macro_rules! atomic_impl {
     }
 }
 
-#[cfg(all(feature = "std", not(no_std_atomic)))]
+#[cfg(all(feature = "std", not(target_os = "none"), not(no_std_atomic)))]
 atomic_impl! {
     AtomicBool "8"
     AtomicI8 "8"
@@ -1044,7 +1044,7 @@ atomic_impl! {
     AtomicUsize "ptr"
 }
 
-#[cfg(all(feature = "std", not(no_std_atomic64)))]
+#[cfg(all(feature = "std", not(target_os = "none"), not(no_std_atomic64)))]
 atomic_impl! {
     AtomicI64 "64"
     AtomicU64 "64"

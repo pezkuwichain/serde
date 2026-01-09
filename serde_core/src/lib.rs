@@ -37,7 +37,9 @@
 // Serde types in rustdoc of other crates get linked to here.
 #![doc(html_root_url = "https://docs.rs/serde_core/1.0.228")]
 // Support using Serde without the standard library!
-#![cfg_attr(not(feature = "std"), no_std)]
+// Also force no_std on target_os = "none" (wasm32v1-none) even if std feature is enabled
+// This handles Cargo feature unification where std gets enabled for no_std targets
+#![cfg_attr(any(not(feature = "std"), target_os = "none"), no_std)]
 // Show which crate feature enables conditionally compiled APIs in documentation.
 #![cfg_attr(docsrs, feature(doc_cfg, rustdoc_internals))]
 #![cfg_attr(docsrs, allow(internal_features))]
