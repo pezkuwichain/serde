@@ -232,7 +232,8 @@ macro_rules! num_as_copysign_self {
         where
             E: Error,
         {
-            #[cfg(not(feature = "std"))]
+            // On no_std or wasm32v1-none (target_os = "none"), use simple cast
+            #[cfg(any(not(feature = "std"), target_os = "none"))]
             {
                 Ok(v as Self::Value)
             }
