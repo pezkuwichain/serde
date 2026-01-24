@@ -1,11 +1,5 @@
 use crate::lib::*;
 
-// Explicit prelude import for wasm32v1-none and other no_std targets
-// Even when "std" feature is enabled (due to Cargo feature unification),
-// the prelude may not be injected on wasm32v1-none target
-#[allow(unused_imports)]
-use ::core::prelude::rust_2021::*;
-
 use crate::de::{
     Deserialize, Deserializer, EnumAccess, Error, MapAccess, SeqAccess, Unexpected, VariantAccess,
     Visitor,
