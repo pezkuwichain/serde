@@ -102,7 +102,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(all(not(feature = "std"), feature = "alloc"))]
+#[cfg(all(feature = "alloc", any(not(feature = "std"), target_os = "none")))]
 extern crate alloc;
 
 // Explicitly import core crate for no_std targets (especially wasm32v1-none)
